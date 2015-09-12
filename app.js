@@ -2,8 +2,6 @@ var server = require('http').createServer();
 
 var io = require('socket.io')(server);
 
-//var GameController = require('GameController.js')();
-
 var port = 1337;
 
 var Sockets = [];
@@ -25,17 +23,20 @@ io.on('connection', function (socket)
  	{
  		if (username == 'User') 
  		{
- 			username = ('User ' + totalSocketCount);
+ 			var newname = ('User ' + totalSocketCount);
+ 			io.emit('updateName', sessionid, newname);
  		};
 
- 		var info = {id: sessionid, username: username};
+ 		var info = {id: sessionid, username: newname};
 
-  		Sockets.push(info);  	
-  	
-  		console.log(Sockets);
+  		Sockets.push(info);
 
   		io.emit('newUser', Sockets, info);
   	});
+
+  	socket.on('chatUpdate', function (entry) {
+  		io.emit('chatUpdate', entry);
+  	})
 
   	socket.on('disconnect', function () 
   	{
@@ -56,7 +57,5 @@ io.on('connection', function (socket)
 	  			};
 	  		};
 	  	};
-
-	  	console.log(Sockets);
 	});
 });
